@@ -39,7 +39,7 @@ jobs:
           "messages": [
             {
               "type": "text",
-              "text": "本日の分析結果はこちら👇\nhttps://ユーザー名.github.io/slot-analyzer/"
+              "text": "本日の分析結果はこちら👇\nhttps://https://otlwww-cell.github.io/slot-analyzer/"
             }
           ]
         }'
