@@ -2,8 +2,13 @@ name: Daily Slot Analyzer
 
 on:
   schedule:
-    - cron: '30 20 * * *'   # JST 5:30
+    - cron: '30 20 * * *'
   workflow_dispatch:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
 jobs:
   run:
@@ -18,28 +23,18 @@ jobs:
         python-version: '3.10'
 
     - name: Run analyzer
-      run: |
-        python analyzer.py
+      run: python analyzer.py
 
-    - name: Commit & Push
-      run: |
-        git config user.name "github-actions"
-        git config user.email "actions@github.com"
-        git add web/index.html
-        git commit -m "update result"
-        git push
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: .
 
-    - name: Send LINE message
-      run: |
-        curl -X POST https://api.line.me/v2/bot/message/push \
-        -H "Authorization: Bearer ${{ secrets.LINE_TOKEN }}" \
-        -H "Content-Type: application/json" \
-        -d '{
-          "to": "'"${{ secrets.LINE_USER_ID }}"'",
-          "messages": [
-            {
-              "type": "text",
-              "text": "本日の分析結果はこちら👇\nhttps://https://otlwww-cell.github.io/slot-analyzer/"
-            }
-          ]
-        }'
+  deploy:
+    needs: run
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+    steps:
+      - name: Deploy to Pages
+        uses: actions/deploy-pages@v4
